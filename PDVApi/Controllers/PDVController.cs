@@ -13,36 +13,40 @@ namespace PDVApi.Controllers
     [ApiController]
     public class PDVController : ControllerBase
     {
+
+        #region
+        /*
+        //Persistencia EntityFrameWorks
+
         private readonly PDVContext _PDVContext;
 
-        public PDVController(PDVContext PDVContext) 
+        public PDVController(PDVContext PDVContext)
         {
             _PDVContext = PDVContext;
         }
-
 
         // GET: api/PDV
         [HttpGet]
         public IEnumerable<PDV> Get()
         {
-            return _PDVContext.PDVS ;
+            return _PDVContext.PDVS;
         }
 
         // GET: api/PDV/5
         [HttpGet("{id}", Name = "Get")]
         public PDV Get(int id)
         {
-            return _PDVContext.PDVS.SingleOrDefault(x=> x.PDVId == id);
+            return _PDVContext.PDVS.SingleOrDefault(x => x.PDVId == id);
         }
 
         // POST: api/PDV
         [HttpPost]
         public void Post([FromBody] PDV pdv)
         {
-            pdv.NotasMoedas = calculaTroco(pdv.Preco,pdv.Pagamento);
+            pdv.NotasMoedas = calculaTroco(pdv.Preco, pdv.Pagamento);
 
             pdv.Troco = pdv.Pagamento - pdv.Preco;
-            
+
             _PDVContext.PDVS.Add(pdv);
             _PDVContext.SaveChanges();
         }
@@ -64,12 +68,11 @@ namespace PDVApi.Controllers
         public void Delete(int id)
         {
             var item = _PDVContext.PDVS.FirstOrDefault(x => x.PDVId == id);
-            if (item != null) 
+            if (item != null)
             {
                 _PDVContext.PDVS.Remove(item);
             }
         }
-
         private String calculaTroco(double valorDevido, double valorDado)
         {
             int[] cedulas = { 100, 50, 20, 10, 5, 2 };
@@ -116,9 +119,60 @@ namespace PDVApi.Controllers
                 i = i + 1;
                 // próximo 
             }
-            
+
             return (resultado);
+
+        }//private String calculaTroco(double valorDevido, double valorDado)
+        */
+        #endregion
+
+
+        #region
+        //Persistencia Dapper
+        private readonly PdvRepository pdvRepository;
+
+        public PDVController()
+        {
+            pdvRepository = new PdvRepository();
         }
 
-    }
-}
+        [HttpGet]
+        public IEnumerable<PDV> Get()
+        {
+            return pdvRepository.GetAll();
+        }
+
+        [HttpGet("{id}")]
+        public PDV Get(int id)
+        {
+            return pdvRepository.GetById(id);
+        }
+
+        [HttpPost]
+        public void Post([FromBody] PDV pdv) 
+        {
+            if (ModelState.IsValid)
+                pdvRepository.Add(pdv);
+        }
+
+        [HttpPut("{id}")]
+        public void Put(int id, [FromBody] PDV pdv)
+        {
+            pdv.PDVId = id;
+            if (ModelState.IsValid)
+                pdvRepository.Update(pdv);
+        }
+        [HttpDelete]
+
+        public void Delete(int id) 
+        {
+            pdvRepository.Delete(id);
+        }
+
+
+
+        #endregion
+
+    }//public class PDVController : ControllerBase
+
+}//namespace PDVApi.Controllers
