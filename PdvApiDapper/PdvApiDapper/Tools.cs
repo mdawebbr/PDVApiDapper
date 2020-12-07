@@ -31,7 +31,7 @@ namespace PdvApiDapper.Tools
                     valor %= cedulas[i];
                     // resto
                 }
-                i = i + 1;
+                i += 1;
                 // próxima nota
             }
             resultado += "\n";
